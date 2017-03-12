@@ -2,7 +2,7 @@ FROM python:2-alpine
 
 ADD stream.py /
 
-RUN apk update
+RUN apk add --update \
     gcc \
     libffi-dev \
     python-dev \
