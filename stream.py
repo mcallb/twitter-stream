@@ -19,6 +19,15 @@ class MyStreamListener(tweepy.StreamListener):
         if status.text.startswith('RT'):
             return
 
+        # If any of the words in search filter match
+        # we are interested in the tweet
+        if any(x in status.text.lower() for x in SEARCH_FILTER):
+            print "Filter triggered"
+            session = boto3.Session()
+            sns = session.client('sns')
+            sns.publish(TopicArn='arn:aws:sns:us-east-1:354280536914:SendSms', Message="Sent via topic: %s" % status.text)
+
+
         # Add any tweets from the stream to a dynamodb table
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table('stream')
@@ -31,15 +40,6 @@ class MyStreamListener(tweepy.StreamListener):
                 'text': status.text
             }
         )
-
-        # If any of the words in search filter match
-        # we are interested in the tweet
-        if any(x in status.text.lower() for x in SEARCH_FILTER):
-            print "Filter triggered"
-            session = boto3.Session()
-            sns = session.client('sns')
-            sns.publish(TopicArn='arn:aws:sns:us-east-1:354280536914:SendSms', Message="Sent via topic: %s" % status.text)
-
         # print status.user.screen_name, status.id, status.created_at, status.source, status.text
 
     def on_error(self, status_code):
