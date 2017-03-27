@@ -3,7 +3,6 @@ import json
 import os
 import boto3
 from credstash import getSecret
-#from boto3.dynamodb2.table import Table
 
 # @RedstoneLiquors: 109292604
 # @rapidliquors: 198174347
@@ -20,19 +19,8 @@ class MyStreamListener(tweepy.StreamListener):
         if status.text.startswith('RT'):
             return
 
-        # If any of the words in search filter match
-        # we are interested in the tweet
-        if any(x in status.text.lower() for x in SEARCH_FILTER):
-            print "Filter triggered"
-            session = boto3.Session()
-            sns = session.client('sns')
-            sns.publish(TopicArn='arn:aws:sns:us-east-1:354280536914:SendSms', Message="Sent via topic: %s" % status.text)
-        # Just print the status
-        #print(status)
-        print status.user.screen_name, status.id, status.created_at, status.source, status.text
-
+        # Add any tweets from the stream to a dynamodb table
         dynamodb = boto3.resource('dynamodb')
-
         table = dynamodb.Table('stream')
         table.put_item(
             Item={
@@ -43,6 +31,16 @@ class MyStreamListener(tweepy.StreamListener):
                 'text': status.text
             }
         )
+
+        # If any of the words in search filter match
+        # we are interested in the tweet
+        if any(x in status.text.lower() for x in SEARCH_FILTER):
+            print "Filter triggered"
+            session = boto3.Session()
+            sns = session.client('sns')
+            sns.publish(TopicArn='arn:aws:sns:us-east-1:354280536914:SendSms', Message="Sent via topic: %s" % status.text)
+
+        # print status.user.screen_name, status.id, status.created_at, status.source, status.text
 
     def on_error(self, status_code):
         print 'Exception...'
@@ -73,6 +71,7 @@ if __name__ == '__main__':
 
     FOLLOW_FILTER = eval(os.getenv('FOLLOW_FILTER', "['109292604','198174347','14584420']"))
     SEARCH_FILTER = eval(os.getenv('SEARCH_FILTER', "['trilliumbrewing','trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac','sip of sunshine','lawsonsfinest','lawsons','beer\\'d']"))
+
     # Convert to lowercase for searching
     SEARCH_FILTER = map(lambda x: x.lower(), SEARCH_FILTER)
 
@@ -90,17 +89,4 @@ if __name__ == '__main__':
     )
     myStreamListener = MyStreamListener()
     myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
-    #myStream.filter(follow=FOLLOW_FILTER, async=True)
-    myStream.filter(track=['beer'])
-
-    # while True:
-    #     try:
-    #         myStreamListener = MyStreamListener()
-    #         myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
-    #         myStream.filter(follow=FOLLOW_FILTER, async=True)
-    #     except:
-    #         continue
-
-
-
-
+    myStream.filter(follow=FOLLOW_FILTER, async=True)
