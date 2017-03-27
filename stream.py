@@ -3,6 +3,7 @@ import json
 import os
 import boto3
 from credstash import getSecret
+#from boto3.dynamodb2.table import Table
 
 # @RedstoneLiquors: 109292604
 # @rapidliquors: 198174347
@@ -27,7 +28,21 @@ class MyStreamListener(tweepy.StreamListener):
             sns = session.client('sns')
             sns.publish(TopicArn='arn:aws:sns:us-east-1:354280536914:SendSms', Message="Sent via topic: %s" % status.text)
         # Just print the status
-        print(status)
+        #print(status)
+        print status.user.screen_name, status.id, status.created_at, status.source, status.text
+
+        dynamodb = boto3.resource('dynamodb')
+
+        table = dynamodb.Table('stream')
+        table.put_item(
+            Item={
+                'screen_name': status.user.screen_name,
+                'id': status.id,
+                'created_at': str(status.created_at),
+                'source': status.source,
+                'text': status.text
+            }
+        )
 
     def on_error(self, status_code):
         print 'Exception...'
@@ -73,7 +88,19 @@ if __name__ == '__main__':
         wait_on_rate_limit = True,
         wait_on_rate_limit_notify = True
     )
-
     myStreamListener = MyStreamListener()
     myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
-    myStream.filter(follow=FOLLOW_FILTER, async=True)
+    #myStream.filter(follow=FOLLOW_FILTER, async=True)
+    myStream.filter(track=['beer'])
+
+    # while True:
+    #     try:
+    #         myStreamListener = MyStreamListener()
+    #         myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
+    #         myStream.filter(follow=FOLLOW_FILTER, async=True)
+    #     except:
+    #         continue
+
+
+
+
