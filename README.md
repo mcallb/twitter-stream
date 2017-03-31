@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mcallb/twitter-stream.svg?branch=master)](https://travis-ci.org/mcallb/twitter-stream)
+
 # twitter-stream
 Monitors specific twitter handles for keywords and sends a message to sns.
 
