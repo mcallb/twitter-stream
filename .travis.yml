@@ -2,19 +2,14 @@ sudo: required
 language: python
 python:
 - '2.7'
-
 services:
 - docker
-
 before_install:
 - docker build -t mcallb/twitter-stream .
-
 script: echo 'Hello Build'
-
 after_success:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
   docker push mcallb/twitter-stream; fi
-
 deploy:
   provider: lambda
   function_name: write_distinct_handle
@@ -24,4 +19,4 @@ deploy:
   handler_name: lambda_handler
   access_key_id: AKIAJM3N2QMHQMRCAV2A
   secret_access_key:
-    secure: n66FdfVmRP9TIaF2qN80kXqr4McSZsNr5ia/tcSIMM5gXxMp9K7julwOV1qj9Q8+dHrwuaJHegcKcrcpQDa6YEkF7x8TH5sFaj10lUujbNIFFFAm6LIOKlz6W3KoQBdZUCm3sggg25qYkNR/cdK4DHf+/ZDUMVeMlqBiDNfgWyeYaKrs2HGuRfecFMWOUjuklVvXyeZ47to+BB/piiNg/Tj7vSjR3DBrD1K8lKJvCP24sHFRxJ6ImB6+/4UPaOuMiJrqzywu1FSMpIwDmn5pcZzFkRr0acPBX30zVYrvIwS4jsaH6fT9UvfQudZVRcTyMKDk3XeeN4Z2T3eD62av8yP9c8qQc2a/wBYjHq7vkZbP+7l/crWx7IvuvkNnAY94XZ04YTDwbNwtVm+7HICjLCFQ+6f0qpaKeZ1yRhO8CdTlKVqZ5MjkSMHjgy1pZeYhWTM6cinhnnvoEnDSYtfUlg/OycnnltiMb9c8HMxRAsdkNfn5H3PdKFLnB4ayarJnivU1EwI+yPBoUVbG4h+x/grJYEr7YFIpq4lHiYnXaRuK1R7fNPwQQzFHtvjMyfwa7ECZNyvu8nKEEI6Nv2xAtod6DSVfWLN1V2J6xNN1FDasHdYmrn5t9/l6QqhFOlLkexJHFND+JIZ9fUjFY716iFIZYgjfV/PfHUEPPsCWte0=
+    secure: CqHZGhHYgvODebSpd3nz5oXHnnOJZfvhowu5Ca+O7KgbWj+A9Rqw6TjARYCdVcnrlMRP/lwVzmuli71nYKoH4//L6rnn/oExpsdp2cLszBVyVJKZO8cU5Wk2BVNrxvZzuEEaupDVHu0JoFDsP8Ae3O+bY2L0VA8E8oX5388PT3Djj0TCMxPYLD+2pQGcMwk2jUo5abDyxJaMN1uk+fAfsu01OHtqquT8Sn9Fb0GjdvGj9ZtrUUTegD1UPB02Hw97bwQefaXP3jI/LH1mPXN6aFQnOLMVhKokFcNVhxbH2rNNyv7w1d4K1Xu5kPnCSIe5zAXcVE8jvGqSTG15HDOknlrcJ+rjx4C9+43wcfFOLVpLbTcdoL7ano7K0R/3MIe4yyfdDqAcKGsLLH1FChIKCMlqt8XZU1pPoymELgAGVo7UIMJJzbmx5/wYHAkxm9BBlmOWqbdIarNtlICmjIs6eDsQNX8xfzniLPY6KrrkhmSgHf61AhkgvlbrOxTn3vKyxqagridoofEHEoibiSjfFH46tSKC/7K7gZGOagTO2p2ja2EsJRk3NsCpvgbBJGo6AGuAYIENL1gLydUwnQqTxqaSG8eLQNAxZGEJsOnHugfnMZpYLIcTfe+owmpr7sW0hOnhRA/nTpcnjdsKpscmvyWvsOBZW19WIKGDNttHG34=
