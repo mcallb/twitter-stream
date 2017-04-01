@@ -12,11 +12,11 @@ after_success:
   docker push mcallb/twitter-stream; fi
 deploy:
   provider: lambda
-  function_name: write_distinct_stream
+  function_name: write_distinct_handle
   region: us-east-1
   role: arn:aws:iam::354280536914:role/service-role/LambdaRole
   runtime: python2.7
-  zip: lambda/write_distinct_stream.py
+  zip: lambda/write_distinct_handle.py
   handler_name: lambda_function.lambda_handler
   access_key_id: AKIAJM3N2QMHQMRCAV2A
   secret_access_key:
