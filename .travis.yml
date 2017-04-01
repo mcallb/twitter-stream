@@ -15,9 +15,9 @@ deploy:
   function_name: ci-test
   region: us-east-1
   role: arn:aws:iam::354280536914:role/service-role/LambdaRole
-  runtime: python
+  runtime: python2.7
   zip : lambda/write_distinct_stream.py
-  handler_name: lambda_handler
+  handler_name: lambda_function.lambda_handler
   access_key_id: AKIAJM3N2QMHQMRCAV2A
   secret_access_key:
     secure: UD7+vzohpdHW7zhZLFi2yAIQ9gho8PclABfZKwPoF+F+NWUPU4TA0At4gVPaiHx71Hij/T8VgnS5LRGEjhO+YxPCkI8exTXLnD4eUW9tJhu+YqE49U1OOIcqF+lGSyoqTMelefyHs7Mkq9W2YqOHzUBnu5Eh8TZJxO3IV7krI8bxIjoykn55TZ0qwxEzapHlt6wrJkJ3SrrXL8HVSpquXHdoiOlJ5pzsmpgXfTFKwme5QcvupKM7hr/uNgVXGoh2folmVgEB9iL7kBPg5r50u01swdx30Z5MovQSUQlPMkfnSuIm+iSTThuQkFUhrvBcGL1tRsZKRkUmfVQCS6vypl6EAlyhO39Kmp/cr1uW6cDMOCAxywx3PFplgW+TofPc9zaTVh0PVfJ8RZzTp0izruR64Q1dyGjG1+WNQVNlCNwc6JcY9R5KFmzACB7rFmFb4PUxMkeCkx5jjJkOorLUvh6djwEROx7mcRLixNJLrCA9l+YCFTGrhnv1fGFa6zM2sfdOR+W1fW+GsrQubA3/c47iPvcq2iO+u/n9XMIDiToO1jGooFfIs8Xwqv4TPEtkrf5S1vN+y75KxLUBdrk3z1J/4pkBkvr+KfS9vF2Z3RfIGyO18UkyblXqoZbBYtRYzX7FV5fy4g7dqt95y/pSgH8YiMG4kN8+KOVc35TYISk=
