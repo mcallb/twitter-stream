@@ -15,7 +15,8 @@ deploy:
   function_name: ci-test
   region: us-east-1
   role: arn:aws:iam::354280536914:role/service-role/LambdaRole
-  runtime: python2.7
+  runtime: python
+  zip : lambda/write_distinct_stream.py
   handler_name: lambda_handler
   access_key_id: AKIAJM3N2QMHQMRCAV2A
   secret_access_key:
