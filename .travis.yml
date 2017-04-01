@@ -12,7 +12,7 @@ after_success:
   docker push mcallb/twitter-stream; fi
 deploy:
   provider: lambda
-  function_name: write_distinct_handle
+  function_name: ci-test
   region: us-east-1
   role: arn:aws:iam::354280536914:role/service-role/LambdaRole
   runtime: python2.7
