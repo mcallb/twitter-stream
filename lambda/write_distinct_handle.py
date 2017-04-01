@@ -4,7 +4,7 @@ import json
 import boto3
 
 print('Loading function')
-
+# This was deployed with trvis
 
 def lambda_handler(event, context):
     # print("Received event: " + json.dumps(event, indent=2))
