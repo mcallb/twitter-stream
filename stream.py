@@ -37,7 +37,8 @@ class MyStreamListener(tweepy.StreamListener):
                 'id': status.id,
                 'created_at': str(status.created_at),
                 'source': status.source,
-                'text': status.text
+                'text': status.text,
+                'json': status
             }
         )
         # print status.user.screen_name, status.id, status.created_at, status.source, status.text
