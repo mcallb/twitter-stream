@@ -12,6 +12,7 @@ from credstash import getSecret
 class MyStreamListener(tweepy.StreamListener):
     tweepy.debug(True)
     def on_status(self, status):
+
         if status.retweeted:
             return
         if status.lang != "en":
@@ -38,7 +39,7 @@ class MyStreamListener(tweepy.StreamListener):
                 'created_at': str(status.created_at),
                 'source': status.source,
                 'text': status.text,
-                'json': json.dumps(status)
+                'json': json.dumps(status._json)
             }
         )
         # print status.user.screen_name, status.id, status.created_at, status.source, status.text
@@ -91,3 +92,4 @@ if __name__ == '__main__':
     myStreamListener = MyStreamListener()
     myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
     myStream.filter(follow=FOLLOW_FILTER, async=True)
+    #myStream.filter(track="python", async=True)
