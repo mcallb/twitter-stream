@@ -22,7 +22,7 @@ def lambda_handler(event, context):
         if (record['eventName'] == "INSERT"):
             table.put_item(
                 Item={
-                    'search': tableKey
+                    'handle': tableKey
                 }
             )
 
@@ -30,7 +30,7 @@ def lambda_handler(event, context):
         elif (record['eventName'] == "REMOVE"):
             table.delete_item(
                 Key={
-                    'search': tableKey
+                    'handle': tableKey
                 }
             )
 
