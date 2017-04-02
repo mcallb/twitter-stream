@@ -15,7 +15,7 @@ def lambda_handler(event, context):
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table('distinct_follow_handle')
 
-        tableKey = json.dumps(record['dynamodb']['Keys']['search']['S']).strip('\"')
+        tableKey = json.dumps(record['dynamodb']['Keys']['handle']['S']).strip('\"')
         print("This is talbeKey" + tableKey)
 
         # On insert add the item to the table
