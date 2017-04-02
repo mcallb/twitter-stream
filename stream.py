@@ -19,6 +19,8 @@ class MyStreamListener(tweepy.StreamListener):
             return
         if status.text.startswith('RT'):
             return
+        if status.in_reply_to_status_id == "null":
+            return
 
         # If any of the words in search filter match
         # we are interested in the tweet
