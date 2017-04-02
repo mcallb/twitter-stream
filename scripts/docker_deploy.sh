@@ -12,4 +12,4 @@ docker run -d \
     --env "AWS_ACCESS_KEY_ID=AKIAJUZEOPB5NNQHJORA" \
     --env "AWS_SECRET_ACCESS_KEY=$aws_access_key" \
     --env "AWS_DEFAULT_REGION=us-east-1" \
-    --name twitter-stream twitter-stream:latest
+    --name twitter-stream mcallb/twitter-stream:latest
