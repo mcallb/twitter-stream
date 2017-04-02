@@ -1,9 +1,9 @@
 from __future__ import print_function
-
 import json
 import boto3
 
 print('Loading function')
+
 
 def lambda_handler(event, context):
     # print("Received event: " + json.dumps(event, indent=2))
@@ -14,10 +14,26 @@ def lambda_handler(event, context):
 
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table('distinct_follow_search')
-        table.put_item(
-            Item={
-                'search': json.dumps(record['dynamodb']['Keys']['search']['S']).strip('\"')
-            }
-        )
+
+        tableKey = json.dumps(record['dynamodb']['Keys']['search']['S']).strip('\"')
+
+        # On insert add the item to the table
+        if (record['eventName'] == "INSERT"):
+            table.put_item(
+                Item={
+                    'search': tableKey
+                }
+            )
+
+        # On delete remove the item from the table
+        elif (record['eventName'] == "REMOVE"):
+            table.delete_item(
+                Key={
+                    'search': tableKey
+                }
+            )
+
+        else:
+            print("Nothing to do. EventName = " + record['eventName'])
 
     return 'Successfully processed {} records.'.format(len(event['Records']))
