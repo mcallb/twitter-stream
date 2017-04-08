@@ -8,6 +8,18 @@ from credstash import getSecret
 # @rapidliquors: 198174347
 # @mcallb: 14584420
 
+def get_filter(table_name):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
+
+
+def get_search_filter(table_name):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
+    response = table.scan()
+    for x in response['Items']:
+        print x
+
 # Override the StreamListener class
 class MyStreamListener(tweepy.StreamListener):
     tweepy.debug(True)
@@ -19,7 +31,7 @@ class MyStreamListener(tweepy.StreamListener):
             return
         if status.text.startswith('RT'):
             return
-        if status.in_reply_to_status_id == "null":
+        if status.in_reply_to_status_id is not None:
             return
 
         # If any of the words in search filter match
@@ -41,7 +53,8 @@ class MyStreamListener(tweepy.StreamListener):
                 'created_at': str(status.created_at),
                 'source': status.source,
                 'text': status.text,
-                'json': json.dumps(status._json)
+                'json': json.dumps(status._json),
+                'user_id': status.user.id
             }
         )
         # print status.user.screen_name, status.id, status.created_at, status.source, status.text
