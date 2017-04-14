@@ -86,8 +86,8 @@ if __name__ == '__main__':
     # The input parameter for filter is expecting a list but env vars are strings
     # so we need to convert them to a list using eval.
 
-    FOLLOW_FILTER = eval(os.getenv('FOLLOW_FILTER', "['109292604','198174347','14584420']"))
-    SEARCH_FILTER = eval(os.getenv('SEARCH_FILTER', "['trilliumbrewing','trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac','sip of sunshine','lawsonsfinest','lawsons','beer\\'d']"))
+    FOLLOW_FILTER = eval(os.getenv('FOLLOW_FILTER', "['109292604','198174347','14584420','2360048978']"))
+    SEARCH_FILTER = eval(os.getenv('SEARCH_FILTER', "['fort hill brewery','@FortHillBeer','@lamplighterbrew','@finbackbrewery','trilliumbrewing','trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac','sip of sunshine','lawsonsfinest','lawsons','beer\\'d']"))
 
     # Convert to lowercase for searching
     SEARCH_FILTER = map(lambda x: x.lower(), SEARCH_FILTER)
@@ -105,6 +105,8 @@ if __name__ == '__main__':
         wait_on_rate_limit_notify = True
     )
     myStreamListener = MyStreamListener()
+
+    
     myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
     myStream.filter(follow=FOLLOW_FILTER, async=True)
     #myStream.filter(track="python", async=True)
