@@ -33,6 +33,10 @@ class MyStreamListener(tweepy.StreamListener):
             return
         if status.in_reply_to_status_id is not None:
             return
+        if status.in_reply_to_user_id is not None:
+            return
+        if status.in_reply_to_screen_name is not None:
+            return 
 
         # If any of the words in search filter match
         # we are interested in the tweet
