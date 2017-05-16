@@ -7,7 +7,8 @@ RUN apk add --update \
     libffi-dev \
     python-dev \
     openssl-dev \
-    musl-dev
+    musl-dev \
+    py-mysqldb
 
 RUN pip install tweepy boto3 credstash
 

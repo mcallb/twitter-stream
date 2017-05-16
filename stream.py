@@ -3,6 +3,7 @@ import json
 import os
 import boto3
 from credstash import getSecret
+import pymysql.cursors
 
 # @RedstoneLiquors: 109292604
 # @rapidliquors: 198174347
@@ -11,6 +12,25 @@ from credstash import getSecret
 def get_filter(table_name):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
+
+
+def get_follow_filer():
+    # Connect to the database
+    # sudsfinder:PASSWORD@sudsfinder.c3hhbip7c3ty.us-east-1.rds.amazonaws.com:3306/sudsfinder
+    connection = pymysql.connect(host='sudsfinder.c3hhbip7c3ty.us-east-1.rds.amazonaws.com',
+                                 user='sudsfinder',
+                                 password=getSecret('sudsfinder'),
+                                 db='sudsfinder',
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT `handle_user_id` FROM `handle`"
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            return result
+    finally:
+        connection.close()
 
 
 def get_search_filter(table_name):
@@ -36,7 +56,7 @@ class MyStreamListener(tweepy.StreamListener):
         if status.in_reply_to_user_id is not None:
             return
         if status.in_reply_to_screen_name is not None:
-            return 
+            return
 
         # If any of the words in search filter match
         # we are interested in the tweet
@@ -81,6 +101,11 @@ class MyStreamListener(tweepy.StreamListener):
 
 if __name__ == '__main__':
 
+    # handles = get_follow_filer()
+    # FOLLOW_FILTER = []
+    # for handle in handles:
+    #     FOLLOW_FILTER.append(handle["handle_user_id"])
+
     CONSUMER_KEY = getSecret('twitter-consumer-key')
     CONSUMER_SECRET = getSecret('twitter-consumer-secret')
     ACCESS_TOKEN = getSecret('twitter-access-token')
@@ -90,8 +115,10 @@ if __name__ == '__main__':
     # The input parameter for filter is expecting a list but env vars are strings
     # so we need to convert them to a list using eval.
 
-    FOLLOW_FILTER = eval(os.getenv('FOLLOW_FILTER', "['109292604','198174347','14584420','2360048978']"))
-    SEARCH_FILTER = eval(os.getenv('SEARCH_FILTER', "['fort hill brewery','@FortHillBeer','@lamplighterbrew','@finbackbrewery','trilliumbrewing','trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac','sip of sunshine','lawsonsfinest','lawsons','beer\\'d']"))
+    FOLLOW_FILTER = ['109292604','198174347','14584420','2360048978']
+    SEARCH_FILTER = ['fort hill brewery','@FortHillBeer','@lamplighterbrew','@finbackbrewery','trilliumbrewing',
+                     'trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac',
+                     'sip of sunshine','lawsonsfinest','lawsons','beer\'d']
 
     # Convert to lowercase for searching
     SEARCH_FILTER = map(lambda x: x.lower(), SEARCH_FILTER)
@@ -108,9 +135,8 @@ if __name__ == '__main__':
         wait_on_rate_limit = True,
         wait_on_rate_limit_notify = True
     )
-    myStreamListener = MyStreamListener()
 
-    
+    myStreamListener = MyStreamListener()
     myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
     myStream.filter(follow=FOLLOW_FILTER, async=True)
     #myStream.filter(track="python", async=True)

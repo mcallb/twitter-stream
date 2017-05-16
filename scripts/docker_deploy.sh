@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 aws_access_key=`credstash get mcallb`
-
 docker pull mcallb/twitter-stream:latest
 docker stop twitter-stream
 docker rm twitter-stream
