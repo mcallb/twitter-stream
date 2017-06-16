@@ -10,6 +10,6 @@ RUN apk add --update \
     musl-dev \
     py-mysqldb
 
-RUN pip install tweepy boto3 credstash
+RUN pip install tweepy boto3 credstash PyMySQL
 
 CMD [ "python", "./stream.py" ]
