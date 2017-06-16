@@ -118,7 +118,7 @@ if __name__ == '__main__':
     FOLLOW_FILTER = ['109292604','198174347','14584420','2360048978']
     SEARCH_FILTER = ['fort hill brewery','@FortHillBeer','@lamplighterbrew','@finbackbrewery','trilliumbrewing',
                      'trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac',
-                     'sip of sunshine','lawsonsfinest','lawsons','beer\'d', 'rhinegeist']
+                     'sip of sunshine','lawsonsfinest','lawsons','rhinegeist','beer\'d']
 
     # Convert to lowercase for searching
     SEARCH_FILTER = map(lambda x: x.lower(), SEARCH_FILTER)
