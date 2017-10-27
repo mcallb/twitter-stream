@@ -73,7 +73,7 @@ class MyStreamListener(tweepy.StreamListener):
         for word in SEARCH_FILTER:
             if word in status.text.lower():
                 send_sqs(status, word)
-                # send_sns(status.text)
+                send_sns(status.text)
 
     def on_error(self, status_code):
         print 'Exception...'
