@@ -1,50 +1,59 @@
 import tweepy
 import json
-import os
 import boto3
 from credstash import getSecret
-import pymysql.cursors
+import requests
 
-# @RedstoneLiquors: 109292604
-# @rapidliquors: 198174347
-# @mcallb: 14584420
 
-def get_filter(table_name):
+def send_sqs(status, filter_word):
+    session = boto3.Session(profile_name='suds_deploy')
+    sqs = session.resource('sqs')
+    queue = sqs.get_queue_by_name(QueueName='twitter_message_live')
+    message = {
+        'screen_name': status.user.screen_name,
+        'created_at': str(status.created_at),
+        'text': status.text,
+        'user_id': status.user.id,
+        'filter_word': filter_word
+    }
+    response = queue.send_message(MessageBody=json.dumps(message))
+    return response.get('MessageId')
+
+
+def send_sns(message):
+    session = boto3.Session()
+    sns = session.client('sns')
+    sns.publish(TopicArn='arn:aws:sns:us-east-1:354280536914:SendSms', Message="Sent via topic: %s" % message)
+
+
+def put_dynamodb(status):
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(table_name)
+    table = dynamodb.Table('stream')
+    table.put_item(
+        Item={
+            'screen_name': status.user.screen_name,
+            'id': status.id,
+            'created_at': str(status.created_at),
+            'source': status.source,
+            'text': status.text,
+            'json': json.dumps(status._json),
+            'user_id': status.user.id
+        }
+    )
 
 
 def get_follow_filer():
-    # Connect to the database
-    # sudsfinder:PASSWORD@sudsfinder.c3hhbip7c3ty.us-east-1.rds.amazonaws.com:3306/sudsfinder
-    connection = pymysql.connect(host='sudsfinder.c3hhbip7c3ty.us-east-1.rds.amazonaws.com',
-                                 user='sudsfinder',
-                                 password=getSecret('sudsfinder'),
-                                 db='sudsfinder',
-                                 charset='utf8mb4',
-                                 cursorclass=pymysql.cursors.DictCursor)
-    try:
-        with connection.cursor() as cursor:
-            sql = "SELECT `handle_user_id` FROM `handle`"
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return result
-    finally:
-        connection.close()
+    request = requests.get('https://dev.sudsfinder.com/filter/handle')
+    handles = request.json()
+    handles = map(str, handles['handle'])
+    return handles
 
-
-def get_search_filter(table_name):
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(table_name)
-    response = table.scan()
-    for x in response['Items']:
-        print x
 
 # Override the StreamListener class
 class MyStreamListener(tweepy.StreamListener):
     tweepy.debug(True)
-    def on_status(self, status):
 
+    def on_status(self, status):
         if status.retweeted:
             return
         if status.lang != "en":
@@ -57,31 +66,14 @@ class MyStreamListener(tweepy.StreamListener):
             return
         if status.in_reply_to_screen_name is not None:
             return
+        # Save tweet from the search filter for debugging
+        put_dynamodb(status)
 
-        # If any of the words in search filter match
-        # we are interested in the tweet
-        if any(x in status.text.lower() for x in SEARCH_FILTER):
-            print "Filter triggered"
-            session = boto3.Session()
-            sns = session.client('sns')
-            sns.publish(TopicArn='arn:aws:sns:us-east-1:354280536914:SendSms', Message="Sent via topic: %s" % status.text)
-
-
-        # Add any tweets from the stream to a dynamodb table
-        dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table('stream')
-        table.put_item(
-            Item={
-                'screen_name': status.user.screen_name,
-                'id': status.id,
-                'created_at': str(status.created_at),
-                'source': status.source,
-                'text': status.text,
-                'json': json.dumps(status._json),
-                'user_id': status.user.id
-            }
-        )
-        # print status.user.screen_name, status.id, status.created_at, status.source, status.text
+        # If any of the words in search filter match we are interested in the tweet and it's send to the queue
+        for word in SEARCH_FILTER:
+            if word in status.text.lower():
+                send_sqs(status, word)
+                # send_sns(status.text)
 
     def on_error(self, status_code):
         print 'Exception...'
@@ -101,24 +93,18 @@ class MyStreamListener(tweepy.StreamListener):
 
 if __name__ == '__main__':
 
-    # handles = get_follow_filer()
-    # FOLLOW_FILTER = []
-    # for handle in handles:
-    #     FOLLOW_FILTER.append(handle["handle_user_id"])
-
     CONSUMER_KEY = getSecret('twitter-consumer-key')
     CONSUMER_SECRET = getSecret('twitter-consumer-secret')
     ACCESS_TOKEN = getSecret('twitter-access-token')
     ACCESS_TOKEN_SECRET = getSecret('twitter-access-token-secret')
-
-    # Use environment variables if they are defined or use default values instead.
-    # The input parameter for filter is expecting a list but env vars are strings
-    # so we need to convert them to a list using eval.
-
-    FOLLOW_FILTER = ['109292604','198174347','14584420','2360048978']
     SEARCH_FILTER = ['fort hill brewery','@FortHillBeer','@lamplighterbrew','@finbackbrewery','trilliumbrewing',
                      'trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac',
                      'sip of sunshine','lawsonsfinest','lawsons','rhinegeist','beer\'d']
+    FOLLOW_FILTER = get_follow_filer()
+    # @RedstoneLiquors: 109292604
+    # @rapidliquors: 198174347
+    # @mcallb: 14584420
+    # FOLLOW_FILTER = ['109292604','198174347','14584420','2360048978']
 
     # Convert to lowercase for searching
     SEARCH_FILTER = map(lambda x: x.lower(), SEARCH_FILTER)
@@ -139,4 +125,7 @@ if __name__ == '__main__':
     myStreamListener = MyStreamListener()
     myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
     myStream.filter(follow=FOLLOW_FILTER, async=True)
-    #myStream.filter(track="python", async=True)
+    # myStream.filter(track="python", async=True)
+
+
+
