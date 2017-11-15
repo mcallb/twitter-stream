@@ -6,9 +6,9 @@ import requests
 
 
 def send_sqs(status, filter_word):
-    session = boto3.Session(profile_name='suds_deploy', region_name='us-east-1')
+    session = boto3.Session(region_name='us-east-1')
     sqs = session.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName='twitter_message_test')
+    queue = sqs.get_queue_by_name(QueueName='twitter_message')
     message = {
         'screen_name': status.user.screen_name,
         'created_at': str(status.created_at),
