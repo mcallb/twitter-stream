@@ -23,7 +23,7 @@ def send_sqs(status, filter_word):
 def send_sns(message):
     session = boto3.Session()
     sns = session.client('sns')
-    sns.publish(TopicArn='arn:aws:sns:us-east-1:354280536914:SendSms', Message="Sent via topic: %s" % message)
+    sns.publish(TopicArn='arn:aws:sns:us-east-1:121050202290:SendSns', Message="Sent via topic: %s" % message)
 
 
 def put_dynamodb(status):
