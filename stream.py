@@ -1,9 +1,8 @@
 import tweepy
 import json
 import boto3
-from credstash import getSecret
 import requests
-
+import os
 
 def send_sqs(status, filter_word):
     session = boto3.Session(region_name='us-east-1')

@@ -2,14 +2,8 @@ FROM python:2-alpine
 
 ADD stream.py /
 
-RUN apk add --update \
-    gcc \
-    libffi-dev \
-    python-dev \
-    openssl-dev \
-    musl-dev \
-    py-mysqldb
+RUN apk add --update
 
-RUN pip install tweepy boto3 credstash PyMySQL
+RUN pip install tweepy boto3
 
 CMD [ "python", "./stream.py" ]
