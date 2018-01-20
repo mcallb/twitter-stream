@@ -92,11 +92,11 @@ class MyStreamListener(tweepy.StreamListener):
         return True
 
 if __name__ == '__main__':
-
-    CONSUMER_KEY = getSecret('twitter-consumer-key')
-    CONSUMER_SECRET = getSecret('twitter-consumer-secret')
-    ACCESS_TOKEN = getSecret('twitter-access-token')
-    ACCESS_TOKEN_SECRET = getSecret('twitter-access-token-secret')
+    CONSUMER_KEY        = os.environ['CONSUMER_KEY']
+    CONSUMER_SECRET     = os.environ['CONSUMER_SECRET']
+    ACCESS_TOKEN        = os.environ['ACCESS_TOKEN']
+    ACCESS_TOKEN_SECRET = os.environ['ACCESS_TOKEN_SECRET']
+    
     SEARCH_FILTER = ['fort hill brewery','@FortHillBeer','@lamplighterbrew','@finbackbrewery','trilliumbrewing',
                      'trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac',
                      'sip of sunshine','lawsonsfinest','lawsons','rhinegeist','beer\'d']
