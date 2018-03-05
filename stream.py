@@ -3,6 +3,7 @@ import json
 import boto3
 import requests
 import os
+from urllib2 import Request, urlopen, URLError, HTTPError
 
 def send_sqs(status, filter_word):
     session = boto3.Session(region_name='us-east-1')
@@ -48,6 +49,62 @@ def get_follow_filer():
     return handles
 
 
+def role_arn_to_session(**args):
+    """
+    Usage :
+        session = role_arn_to_session(
+            RoleArn='arn:aws:iam::012345678901:role/example-role',
+            RoleSessionName='ExampleSessionName')
+        client = session.client('sqs')
+    """
+    client = boto3.client('sts')
+    response = client.assume_role(**args)
+    return boto3.Session(
+        aws_access_key_id=response['Credentials']['AccessKeyId'],
+        aws_secret_access_key=response['Credentials']['SecretAccessKey'],
+        aws_session_token=response['Credentials']['SessionToken'])
+
+
+def get_parameters_by_path(path):
+    """
+    This function reads a secure parameter from AWS' SSM service.
+    The request must be passed a valid parameter name, as well as 
+    temporary credentials which can be used to access the parameter.
+    The parameter's value is returned.
+    """
+    # Create the SSM Client
+    session = role_arn_to_session(RoleArn='arn:aws:iam::354280536914:role/ssm_get_parameters',RoleSessionName='mcallb')
+    ssm = session.client('ssm', region_name='us-east-1')
+
+    # Get the requested parameter
+    response = ssm.get_parameters_by_path(
+        Path=path,
+        WithDecryption=True,
+        Recursive=True
+    )
+    
+    # Store the credentials in a variable
+    credentials = {}
+    
+    for param in parameters['Parameters']:
+        credentials[param['Name']] = param['Value']
+    
+    return credentials
+
+def is_running_in_aws(metadata='http://169.254.169.254/latest/meta-data/'):
+    # from urllib2 import Request, urlopen, URLError, HTTPError
+    req = Request(metadata)
+    try:
+        response = urlopen(req)
+        return True
+    except HTTPError as e:
+        print 'Error code: ', e.code
+        return False
+    except URLError as e:
+        print 'Reason: ', e.reason
+        return False
+
+
 # Override the StreamListener class
 class MyStreamListener(tweepy.StreamListener):
     tweepy.debug(True)
@@ -91,6 +148,15 @@ class MyStreamListener(tweepy.StreamListener):
         return True
 
 if __name__ == '__main__':
+    
+    # If running on an ec2 instance get secrets from parameter store
+    if is_running_in_aws():
+        parameters = get_parameters_by_path('/sudsfinder')
+        os.environ['CONSUMER_KEY']         = parameters['/sudsfinder/twitter-consumer-key']
+        os.environ['CONSUMER_SECRET']      = parameters['/sudsfinder/twitter-consumer-secret']
+        os.environ['ACCESS_TOKEN']         = parameters['/sudsfinder/twitter-access-token']
+        os.environ['ACCESS_TOKEN_SECRET']  = parameters['/sudsfinder/twitter-access-token-secret']
+
     CONSUMER_KEY        = os.environ['CONSUMER_KEY']
     CONSUMER_SECRET     = os.environ['CONSUMER_SECRET']
     ACCESS_TOKEN        = os.environ['ACCESS_TOKEN']
