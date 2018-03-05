@@ -21,13 +21,13 @@ def send_sqs(status, filter_word):
 
 
 def send_sns(message):
-    session = boto3.Session()
+    session = boto3.Session(region_name='us-east-1')
     sns = session.client('sns')
     sns.publish(TopicArn='arn:aws:sns:us-east-1:121050202290:SendSns', Message="Sent via topic: %s" % message)
 
 
 def put_dynamodb(status):
-    dynamodb = boto3.resource('dynamodb')
+    dynamodb = boto3.resource('dynamodb', region_name = 'us-east-1')
     table = dynamodb.Table('stream')
     table.put_item(
         Item={
