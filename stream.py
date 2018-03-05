@@ -77,7 +77,7 @@ def get_parameters_by_path(path):
     ssm = session.client('ssm', region_name='us-east-1')
 
     # Get the requested parameter
-    response = ssm.get_parameters_by_path(
+    parameters = ssm.get_parameters_by_path(
         Path=path,
         WithDecryption=True,
         Recursive=True
