@@ -126,9 +126,13 @@ class MyStreamListener(tweepy.StreamListener):
         put_dynamodb(status)
 
         # If any of the words in search filter match we are interested in the tweet and it's send to the queue
+        count = 0
         for word in SEARCH_FILTER:
             if word in status.text.lower():
+                count += 1
                 send_sqs(status, word)
+            # Sends only the first occurance to sns
+            if count == 1
                 send_sns(status.text)
 
     def on_error(self, status_code):
