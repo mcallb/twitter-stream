@@ -2,8 +2,9 @@ import tweepy
 import json
 import boto3
 import requests
+from requests import HTTPError, ConnectTimeout
 import os
-from urllib2 import Request, urlopen, URLError, HTTPError
+
 
 def send_sqs(status, filter_word):
     session = boto3.Session(region_name='us-east-1')
@@ -42,7 +43,7 @@ def put_dynamodb(status):
     )
 
 
-def get_follow_filer():
+def get_follow_filter():
     request = requests.get('https://dev.sudsfinder.com/filter/handle')
     handles = request.json()
     handles = map(str, handles['handle'])
@@ -93,15 +94,14 @@ def get_parameters_by_path(path):
 
 def is_running_in_aws(metadata='http://169.254.169.254/latest/meta-data/'):
     # from urllib2 import Request, urlopen, URLError, HTTPError
-    req = Request(metadata)
     try:
-        response = urlopen(req)
+        req = requests.get(metadata, timeout=2)
         return True
     except HTTPError as e:
-        print 'Error code: ', e.code
+        #print 'Error code: ', e.code
         return False
-    except URLError as e:
-        print 'Reason: ', e.reason
+    except ConnectTimeout as e:
+        #print 'Reason: ', e.code
         return False
 
 
@@ -132,7 +132,7 @@ class MyStreamListener(tweepy.StreamListener):
                 count += 1
                 send_sqs(status, word)
             # Sends only the first occurance to sns
-            if count == 1
+            if count == 1:
                 send_sns(status.text)
 
     def on_error(self, status_code):
@@ -169,11 +169,11 @@ if __name__ == '__main__':
     SEARCH_FILTER = ['fort hill brewery','@FortHillBeer','@lamplighterbrew','@finbackbrewery','trilliumbrewing',
                      'trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac',
                      'sip of sunshine','lawsonsfinest','lawsons','rhinegeist','beer\'d']
-    FOLLOW_FILTER = get_follow_filer()
+    # FOLLOW_FILTER = get_follow_filter()
     # @RedstoneLiquors: 109292604
     # @rapidliquors: 198174347
     # @mcallb: 14584420
-    # FOLLOW_FILTER = ['109292604','198174347','14584420','2360048978']
+    FOLLOW_FILTER = ['109292604','198174347','14584420','2360048978']
 
     # Convert to lowercase for searching
     SEARCH_FILTER = map(lambda x: x.lower(), SEARCH_FILTER)
