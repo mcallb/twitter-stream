@@ -132,7 +132,7 @@ class MyStreamListener(tweepy.StreamListener):
                 count += 1
                 send_sqs(status, word)
             # Sends only the first occurance to sns
-            if count == 1
+            if count == 1:
                 send_sns(status.text)
 
     def on_error(self, status_code):
