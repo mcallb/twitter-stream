@@ -169,7 +169,7 @@ if __name__ == '__main__':
     SEARCH_FILTER = ['fort hill brewery','@FortHillBeer','@lamplighterbrew','@finbackbrewery','trilliumbrewing',
                      'trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac',
                      'sip of sunshine','lawsonsfinest','lawsons','rhinegeist','beer\'d']
-    # FOLLOW_FILTER = get_follow_filter()
+    # FOLLOW_FILTER = get_follow_filer()
     # @RedstoneLiquors: 109292604
     # @rapidliquors: 198174347
     # @mcallb: 14584420
@@ -195,6 +195,3 @@ if __name__ == '__main__':
     myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
     myStream.filter(follow=FOLLOW_FILTER, async=True)
     # myStream.filter(track="python", async=True)
-
-
-
