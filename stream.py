@@ -104,6 +104,17 @@ def is_running_in_aws(metadata='http://169.254.169.254/latest/meta-data/'):
         #print 'Reason: ', e.code
         return False
 
+def process_tweet(status):
+    # interested in the tweet and it's send to the queue
+    # If any of the words in search filter match we are 
+    count = 0
+    for word in SEARCH_FILTER:
+        if word in status.text.lower():
+            count += 1
+            send_sqs(status, word)
+            # Sends only the first occurance to sns
+            if count == 1:
+                send_sns(status.text)
 
 # Override the StreamListener class
 class MyStreamListener(tweepy.StreamListener):
@@ -124,16 +135,8 @@ class MyStreamListener(tweepy.StreamListener):
             return
         # Save tweet from the search filter for debugging
         put_dynamodb(status)
-
-        # If any of the words in search filter match we are interested in the tweet and it's send to the queue
-        count = 0
-        for word in SEARCH_FILTER:
-            if word in status.text.lower():
-                count += 1
-                send_sqs(status, word)
-            # Sends only the first occurance to sns
-            if count == 1:
-                send_sns(status.text)
+        # Do something with the tweet
+        process_tweet(status)
 
     def on_error(self, status_code):
         print 'Exception...'
