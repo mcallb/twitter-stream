@@ -172,7 +172,7 @@ if __name__ == '__main__':
     SEARCH_FILTER = ['fort hill brewery','@FortHillBeer','@lamplighterbrew','@finbackbrewery','trilliumbrewing',
                      'trillium','maine beer company','maine beer co','foleybrothers','foley brothers','sazerac',
                      'sip of sunshine','lawsonsfinest','lawsons','rhinegeist','captain lawrence','fiddlehead',
-                     'foreign objects','commonwealth brewing','beer\'d']
+                     'foreign objects','commonwealth brewing']
     # FOLLOW_FILTER = get_follow_filer()
     # @RedstoneLiquors: 109292604
     # @rapidliquors: 198174347
