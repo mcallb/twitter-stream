@@ -1,10 +1,10 @@
 import tweepy
 import json
 import boto3
-import requests
-from requests import HTTPError, ConnectTimeout
 import os
+import requests
 
+from requests import HTTPError, ConnectTimeout
 
 def send_sqs(status, filter_word):
     session = boto3.Session(region_name='us-east-1')
