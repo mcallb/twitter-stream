@@ -15,7 +15,7 @@ deploy:
     function_name: write_distinct_handle
     region: us-east-1
     role: arn:aws:iam::354280536914:role/service-role/LambdaRole
-    runtime: python3.7
+    runtime: python2.7
     zip: lambda/write_distinct_handle.py
     handler_name: lambda_handler
     module_name: write_distinct_handle
@@ -26,7 +26,7 @@ deploy:
     function_name: write_distinct_search
     region: us-east-1
     role: arn:aws:iam::354280536914:role/service-role/LambdaRole
-    runtime: python3.7
+    runtime: python2.7
     zip: lambda/write_distinct_search.py
     handler_name: lambda_handler
     module_name: write_distinct_search
