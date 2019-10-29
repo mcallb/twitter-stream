@@ -46,7 +46,7 @@ def put_dynamodb(status):
 def get_follow_filter():
     request = requests.get('https://dev.sudsfinder.com/filter/handle')
     handles = request.json()
-    handles = map(str, handles['handle'])
+    handles = list(map(str, handles['handle']))
     return handles
 
 
@@ -139,19 +139,19 @@ class MyStreamListener(tweepy.StreamListener):
         process_tweet(status)
 
     def on_error(self, status_code):
-        print 'Exception...'
-        print status_code
+        print('Exception...')
+        print(status_code)
         if status_code == 420:
-            print "Status code: %s" % status_code
+            print("Status code: %s" % status_code)
             return True
 
     def on_timeout(self):
-        print 'Timeout...'
+        print('Timeout...')
         return True
 
     def on_exception(self, exception):
-        print 'Exception...'
-        print exception
+        print('Exception...')
+        print(exception)
         return True
 
 if __name__ == '__main__':
@@ -181,9 +181,9 @@ if __name__ == '__main__':
     FOLLOW_FILTER = ['109292604','198174347','14584420','2360048978']
 
     # Convert to lowercase for searching
-    SEARCH_FILTER = map(lambda x: x.lower(), SEARCH_FILTER)
+    SEARCH_FILTER = [x.lower() for x in SEARCH_FILTER]
 
-    print "Starting main..."
+    print("Starting main...")
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
