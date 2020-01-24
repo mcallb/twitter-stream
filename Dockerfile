@@ -1,13 +1,15 @@
 FROM python:3.8.0-alpine3.10
 
-WORKDIR /
+WORKDIR /beer_alert
 
-ADD stream.py ./
-ADD Pipfile ./
+COPY Pipfile .
+COPY setup.py .
 
-RUN apk add --update \
-    && pip install pipenv \
+COPY beer_alert ./beer_alert
+COPY data.yaml .
+
+RUN pip install pipenv \
     && pipenv lock \
     && pipenv install --deploy --system
 
-CMD [ "python", "./stream.py" ]
+CMD [ "python", "./beer_alert/beer_alert.py" ]
